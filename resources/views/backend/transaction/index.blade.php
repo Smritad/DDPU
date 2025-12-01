@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="en">
+    
+<head>
+    @include('components.backend.head')
+</head>
+	   
+		@include('components.backend.header')
+
+	    <!--start sidebar wrapper-->	
+	    @include('components.backend.sidebar')
+	   <!--end sidebar wrapper-->
+<style>
+    .status-filter-group {
+        display: flex;
+        align-items: center;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+        overflow: hidden;
+        width: fit-content;
+        background-color: #fff;
+    }
+    .status-filter-label {
+        background-color: #f8f9fa;
+        padding: 8px 16px;
+        font-weight: 500;
+        border-right: 1px solid #ccc;
+        color: #333;
+        white-space: nowrap;
+    }
+    .status-filter-select {
+        border: none;
+        padding: 8px 16px;
+        outline: none;
+        box-shadow: none;
+        min-width: 149px;
+        color: #333;
+    }
+    .status-filter-select:focus {
+        box-shadow: none;
+    }
+</style>
+    
+    
+
+<div class="page-body">
+  <div class="container-fluid">
+    <div class="page-title">
+      <div class="row">
+        <div class="col-6"><h4>File Details List</h4></div>
+        <div class="col-6">
+          <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ url('/') }}">
+              <svg class="stroke-icon"><use href="../assets/svg/icon-sprite.svg#stroke-home"></use></svg>
+            </a></li>
+          </ol>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Table -->
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-sm-12">
+        <div class="card">
+          <div class="card-body">
+             <!-- Export Button -->
+           <a href="{{ route('file.details.export') }}" class="btn btn-sm btn-primary">
+    Export CSV
+</a>
+
+            <div class="table-responsive">
+              <table class="table table-striped table-bordered" id="fileDetailsTable">
+                <thead class="thead-dark">
+                  <tr>
+                    <th>DD Ref</th>
+                    <th>Account Name</th>
+                    <th>Collection Date</th>
+                    <th>BACS Code</th>
+                      <th>Amount</th>
+                     <th>File Name</th>
+                    <th>Status</th>
+                   
+                  </tr>
+                </thead>
+                <tbody>
+                    
+                  @foreach ($fileDetails as $index => $detail)
+                    <tr>
+                      <td>{{ $detail->dd_reference }}</td>
+                      <td>{{ $detail->account_name }}</td>
+                       <td>{{ $detail->file->collection_date ?? 'N/A' }}</td>
+                      <td>{{ $detail->bacs_code }}</td>
+                      <td>{{ $detail->amount }}</td>
+                    <td>
+                    @php
+                        $originalName = $detail->file->file_name ?? null;
+
+                        if ($originalName) {
+                            // Extract main parts
+                            if (preg_match('/^([A-Za-z]+)[^0-9]*([0-9]{8})/', $originalName, $matches)) {
+                                $name = strtoupper($matches[1]);
+                                $date = \Carbon\Carbon::createFromFormat('Ymd', $matches[2])->format('y-m-d');
+                                echo "{$date} {$name} (Monthly on the 10th).xlsx";
+                            } else {
+                                echo $originalName;
+                            }
+                        } else {
+                            echo 'N/A';
+                        }
+                    @endphp
+                    </td>
+                      <td>
+                        <span class="badge 
+                          {{ $detail->status == 'Processed' ? 'badge-success' : 'badge-warning' }}">
+                          {{ $detail->status ?? 'Pending' }}
+                        </span>
+                      </td>
+                     
+                    </tr>
+                  @endforeach
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+            <!-- footer start-->
+             @include('components.backend.footer')
+      </div>
+    </div>
+
+        @include('components.backend.main-js')
+
+
+</body>
+
+</html>
